@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import React, {Component} from "react";
+import Modal from "./components/Modal";
 import axios from "axios";
 
 class App extends Component{
@@ -34,9 +35,13 @@ class App extends Component{
         >
           <span
             className="product-title"
-            title={item.description}
           >
             {item.name}
+          </span>
+          <span
+            className="production-title"
+          >
+            {item.description}
           </span>
           <span>
             <button
@@ -61,11 +66,11 @@ class App extends Component{
     this.setState({ modal : !this.state.modal });
   }
 
-  handleSubmit = item => {
+  handleSubmit = (item) => {
     this.toggle();
     if(item.id){
       axios
-        .put(`api/products/${item.id}`, item)
+        .put(`api/products/${item.id}/`, item)
         .then(res => this.refreshList());
       return;
     }
@@ -74,7 +79,8 @@ class App extends Component{
       .then(res => this.refreshList());
   };
 
-  handleDelete = item => {
+  handleDelete = (item) => {
+    console.log(item);
     axios
       .delete(`api/products/${item.id}`)
       .then(res => this.refreshList());
@@ -85,7 +91,7 @@ class App extends Component{
     this.setState({activeItem: item, modal: !this.state.modal});
   }
 
-  editItem = item => {
+  editItem = (item) => {
     this.setState({activeItem: item, modal: !this.state.modal});
   }
 
@@ -107,6 +113,13 @@ class App extends Component{
             </div>
           </div>
         </div>
+        {this.state.modal ? (
+          <Modal
+            activeItem={this.state.activeItem}
+            toggle={this.toggle}
+            onSave={this.handleSubmit}
+          />
+        ) : null}
       </main>
     );
   }
