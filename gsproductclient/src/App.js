@@ -1,25 +1,116 @@
 import logo from './logo.svg';
-import './App.css';
+import React, {Component} from "react";
+import axios from "axios";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+class App extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      activeItem: {
+        name:"",
+        description:"",
+        price: 0
+      },
+      productList: []
+    };
+  }
+
+  componentDidMount(){
+    this.refreshList();
+  };
+
+  refreshList = () => {
+    axios
+      .get("api/products/")
+      .then(res => this.setState({productList: res.data}))
+      .catch(err => console.log(err));
+  };
+
+  renderItems = () => {
+    return this.state.productList.map(item => (
+        <li
+          key={item.id}
+          className="list-group-item d-flex justify-content-between align-items-center"
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+          <span
+            className="product-title"
+            title={item.description}
+          >
+            {item.name}
+          </span>
+          <span>
+            <button
+              onClick={() => this.editItem(item)}
+              className="btn btn-secondary mr-2"
+            >
+              Editar{" "}
+            </button>
+            <button
+              onClick={() => this.handleDelete(item)}
+              className="btn btn-danger"
+            >
+              Excluir{" "}
+            </button>
+          </span>
+        </li>
+      )
+    );
+  };
+
+  toggle = () => {
+    this.setState({ modal : !this.state.modal });
+  }
+
+  handleSubmit = item => {
+    this.toggle();
+    if(item.id){
+      axios
+        .put(`api/products/${item.id}`, item)
+        .then(res => this.refreshList());
+      return;
+    }
+    axios
+      .post("api/products/", item)
+      .then(res => this.refreshList());
+  };
+
+  handleDelete = item => {
+    axios
+      .delete(`api/products/${item.id}`)
+      .then(res => this.refreshList());
+  };
+
+  createItem = () => {
+    const item = { name : "", description: "", price: 0};
+    this.setState({activeItem: item, modal: !this.state.modal});
+  }
+
+  editItem = item => {
+    this.setState({activeItem: item, modal: !this.state.modal});
+  }
+
+  render() {
+    return (
+      <main className="content">
+        <h1 className="text-white text-uppercase text-center my-4">Lista de Produtos</h1>
+        <div className="row ">
+          <div className="col-md-6 col-sm-10 mx-auto p-0">
+            <div className="card p-3">
+              <div className="">
+                <button onClick={this.createItem} className="btn btn-primary">
+                  Adicionar Produto
+                </button>
+              </div>
+              <ul className="list-group list-group-flush">
+                {this.renderItems()}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
 }
 
 export default App;
