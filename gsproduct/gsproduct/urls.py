@@ -16,12 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from app import views
-
-router = routers.DefaultRouter()
-router.register(r'products', views.ProductView, 'product')
+from app.views import product_list, product_detail
 
 urlpatterns = [
-    url(r'^api/products$', views.product_list),
-    url(r'^api/products/(?P<pk>[0-9]+)$', views.product_detail),
+    path('admin/', admin.site.urls),
+    path('api/products/', product_list),
+    path('api/products/<int:pk>/', product_detail)
 ]
