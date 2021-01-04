@@ -22,6 +22,6 @@ router = routers.DefaultRouter()
 router.register(r'products', views.ProductView, 'product')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls))
+    url(r'^api/products$', views.product_list),
+    url(r'^api/products/(?P<pk>[0-9]+)$', views.product_detail),
 ]
